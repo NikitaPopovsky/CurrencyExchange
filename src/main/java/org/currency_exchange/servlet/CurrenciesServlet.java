@@ -22,6 +22,6 @@ public class CurrenciesServlet extends HttpServlet {
         resp.setContentType("application/json");
         List<CurrencyDTO> currencies = currenciesService.getAllCurrencies();
         //String json = CurrenciesService
-        resp.getWriter().write(json);
+        //resp.getWriter().write(json);
     }
 }
