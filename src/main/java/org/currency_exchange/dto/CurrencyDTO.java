@@ -1,31 +1,34 @@
 package org.currency_exchange.dto;
 
 public class CurrencyDTO {
-    private int code;
-    private int fullName;
-    private int sign;
+    private String code;
+    private String fullName;
+    private String sign;
 
-    public int getCode() {
+    public CurrencyDTO() {
+    }
+
+    public String getCode() {
         return code;
     }
 
-    public void setCode(int code) {
+    public void setCode(String code) {
         this.code = code;
     }
 
-    public int getFullName() {
+    public String getFullName() {
         return fullName;
     }
 
-    public void setFullName(int fullName) {
+    public void setFullName(String fullName) {
         this.fullName = fullName;
     }
 
-    public int getSign() {
+    public String getSign() {
         return sign;
     }
 
-    public void setSign(int sign) {
+    public void setSign(String sign) {
         this.sign = sign;
     }
 }

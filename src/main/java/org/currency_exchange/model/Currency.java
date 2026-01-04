@@ -2,9 +2,22 @@ package org.currency_exchange.model;
 
 public class Currency {
     private int id;
-    private int code;
-    private int fullName;
-    private int sign;
+    private String code;
+    private String fullName;
+    private String sign;
+
+    public Currency(int id, String code, String fullName, String sign) {
+        this.id = id;
+        this.code = code;
+        this.fullName = fullName;
+        this.sign = sign;
+    }
+
+    public Currency(String code, String fullName, String sign) {
+        this.code = code;
+        this.fullName = fullName;
+        this.sign = sign;
+    }
 
     public int getId() {
         return id;
@@ -14,27 +27,27 @@ public class Currency {
         this.id = id;
     }
 
-    public int getCode() {
+    public String getCode() {
         return code;
     }
 
-    public void setCode(int code) {
+    public void setCode(String code) {
         this.code = code;
     }
 
-    public int getFullName() {
+    public String getFullName() {
         return fullName;
     }
 
-    public void setFullName(int full_name) {
-        this.fullName = full_name;
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
-    public int getSign() {
+    public String getSign() {
         return sign;
     }
 
-    public void setSign(int sign) {
+    public void setSign(String sign) {
         this.sign = sign;
     }
 }

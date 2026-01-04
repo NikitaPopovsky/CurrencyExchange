@@ -1,7 +1,9 @@
 package org.currency_exchange;
 
 public enum Config {
-    PATH_CONFIG_PROPERTIES("src/main/resources/config.properties");
+    PATH_CONFIG_PROPERTIES("src/main/resources/config.properties"),
+    CONFIG_PROPERTIES("config.properties");
+
     private final String value;
 
     Config(String value) {
