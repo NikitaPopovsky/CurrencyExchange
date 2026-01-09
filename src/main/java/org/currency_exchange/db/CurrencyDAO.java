@@ -1,13 +1,11 @@
 package org.currency_exchange.db;
 
-import com.google.protobuf.DescriptorProtos;
+import org.currency_exchange.enums.CurrencySQLQuery;
+import org.currency_exchange.exception.DataBaseUnavailable;
 import org.currency_exchange.mapper.CurrencyDAOMapper;
 import org.currency_exchange.model.Currency;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,60 +21,59 @@ public class CurrencyDAO {
     }
 
     public List<Currency> findAll() {
-        List<Currency> currencies = List.of();
-
         try {
             Statement statement = connection.createStatement();
-            String sql = "SELECT id, code, full_name, sign FROM currencies";
+            String sql = CurrencySQLQuery.FIND_ALL.getSql();
             ResultSet resultSet = statement.executeQuery(sql);
-            currencies = mapper.toCurrencyList(resultSet);
+            return mapper.toCurrencyList(resultSet);
         } catch (SQLException e) {
-            System.out.println("Ошибка при работе с БД");
+            throw new DataBaseUnavailable("Ошибка выполнения базы данных");
         }
-
-        return currencies;
-
     }
 
     public Optional<Currency> findByCode (String code) {
         try {
-            Statement statement = connection.createStatement();
-            String sql = String.format("SELECT id, code, full_name, sign FROM currencies WHERE code = '%s'", code);
+            String sql = CurrencySQLQuery.FIND_BY_CODE.getSql();
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1,code);
             ResultSet resultSet = statement.executeQuery(sql);
             if (resultSet.next()) {
                 return Optional.of(mapper.toCurrency(resultSet));
             }
+            return Optional.empty();
 
         } catch (SQLException e) {
-            System.out.println("Ошибка при работе с БД");
+            throw new DataBaseUnavailable("Ошибка выполнения базы данных");
         }
-
-        return Optional.empty();
     }
 
     public Optional<Currency> findById (int id) {
         try {
-            Statement statement = connection.createStatement();
-            String sql = String.format("SELECT id, code, full_name, sign FROM currencies WHERE id = '%d'", id);
+            String sql = CurrencySQLQuery.FIND_BY_CODE.getSql();
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setInt(1,id);
             ResultSet resultSet = statement.executeQuery(sql);
-            resultSet.next();
-            return Optional.of(mapper.toCurrency(resultSet));
+            if (resultSet.next()) {
+                return Optional.of(mapper.toCurrency(resultSet));
+            }
+            return Optional.empty();
 
         } catch (SQLException e) {
-            System.out.println("Ошибка при работе с БД");
+            throw new DataBaseUnavailable("Ошибка выполнения базы данных");
         }
-
-        return Optional.empty();
     }
 
     public void save (Currency currency) {
         try {
-            Statement statement = connection.createStatement();
-            String sql = String.format("insert into currencies (code, full_name, sign) values ('%s','%s','%s')"
-                , currency.getCode(), currency.getFullName(), currency.getSign());
+            String sql = CurrencySQLQuery.SAVE.getSql();
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1,currency.getCode());
+            statement.setString(1,currency.getFullName());
+            statement.setString(1,currency.getSign());
+
             statement.executeUpdate(sql);
         } catch (SQLException e) {
-            System.out.println("Ошибка при работе с БД");
+            throw new DataBaseUnavailable("Ошибка выполнения базы данных");
         }
     }
 }

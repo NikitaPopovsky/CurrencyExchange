@@ -1,6 +1,7 @@
 package org.currency_exchange.db;
 
 import org.currency_exchange.Config;
+import org.currency_exchange.exception.DataBaseUnavailable;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,7 +17,7 @@ public class UtilDAO {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
         } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
+            throw new DataBaseUnavailable("Ошибка драйвера подключения к БД");
         }
 
     }
@@ -33,10 +34,10 @@ public class UtilDAO {
             //DriverManager.registerDriver(new com.mysql.jdbc.Driver());
             connection = DriverManager.getConnection(config.get("url"), config.get("user"), config.get("password"));
             if (connection == null) {
-                throw new SQLException();
+                throw new DataBaseUnavailable("Ошибка получения соединения с БД");
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DataBaseUnavailable("Ошибка получения соединения с БД");
         }
 
         return connection;
@@ -56,8 +57,7 @@ public class UtilDAO {
             user = properties.getProperty("db.user");
             password = properties.getProperty("db.password");
         } catch (IOException e) {
-            e.printStackTrace();
-            return Map.of();
+            throw new DataBaseUnavailable("Ошибка получения конфигурационных данных");
         }
 
         config.put("url", url);

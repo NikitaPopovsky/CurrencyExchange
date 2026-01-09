@@ -1,7 +1,7 @@
 package org.currency_exchange.mapper;
 
 import org.currency_exchange.db.CurrencyDAO;
-import org.currency_exchange.exception.CurrencyNotFoundException;
+import org.currency_exchange.exception.ModelNotFoundException;
 import org.currency_exchange.model.Currency;
 import org.currency_exchange.model.ExchangeRate;
 
@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class ExchangeRateDAOMapper {
-    public List<ExchangeRate> toExchangeRateList (ResultSet resultSet) throws SQLException, CurrencyNotFoundException {
+    public List<ExchangeRate> toExchangeRateList (ResultSet resultSet) throws SQLException, ModelNotFoundException {
         List<ExchangeRate> exchangeRates = new ArrayList<>();
         while (resultSet.next()) {
             exchangeRates.add(toExchangeRate(resultSet));
@@ -21,7 +21,7 @@ public class ExchangeRateDAOMapper {
         return exchangeRates;
     }
 
-    public ExchangeRate toExchangeRate (ResultSet resultSet) throws SQLException, CurrencyNotFoundException {
+    public ExchangeRate toExchangeRate (ResultSet resultSet) throws SQLException, ModelNotFoundException {
         int id = resultSet.getInt("id");
         int baseCurrencyId = resultSet.getInt("base_currency_id");
         int targetCurrencyId = resultSet.getInt("target_currency_id");
@@ -31,11 +31,10 @@ public class ExchangeRateDAOMapper {
         Optional<Currency> baseCurrencyOptional = currencyDAO.findById(baseCurrencyId);
         Optional<Currency> targetCurrencyOptional = currencyDAO.findById(targetCurrencyId);
 
-        if (baseCurrencyOptional.isPresent() && targetCurrencyOptional.isPresent()) {
-            return new ExchangeRate(id, baseCurrencyOptional.get(), targetCurrencyOptional.get(), rate);
-        } else {
-            throw new CurrencyNotFoundException();
+        if (baseCurrencyOptional.isEmpty() || targetCurrencyOptional.isEmpty()) {
+            throw new ModelNotFoundException("Валюта не найдена");
         }
+        return new ExchangeRate(id, baseCurrencyOptional.get(), targetCurrencyOptional.get(), rate);
 
 
     }

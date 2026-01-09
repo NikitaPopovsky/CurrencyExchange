@@ -1,9 +1,8 @@
 package org.currency_exchange.db;
 
-import org.currency_exchange.exception.CurrencyNotFoundException;
-import org.currency_exchange.mapper.CurrencyDAOMapper;
+import org.currency_exchange.exception.DataBaseUnavailable;
+import org.currency_exchange.exception.ModelNotFoundException;
 import org.currency_exchange.mapper.ExchangeRateDAOMapper;
-import org.currency_exchange.model.Currency;
 import org.currency_exchange.model.ExchangeRate;
 
 import java.math.BigDecimal;
@@ -14,6 +13,8 @@ import java.util.Optional;
 public class ExchangeRateDAO {
     private final Connection connection;
     private final ExchangeRateDAOMapper mapper;
+
+
 
     public ExchangeRateDAO() {
         this.connection = UtilDAO.getConnection();
@@ -27,14 +28,10 @@ public class ExchangeRateDAO {
             Statement statement = connection.createStatement();
             String sql = "SELECT id, base_currency_id, target_currency_id, rate FROM exchange_rates";
             ResultSet resultSet = statement.executeQuery(sql);
-            exchangeRates = mapper.toExchangeRateList(resultSet);
+            return mapper.toExchangeRateList(resultSet);
         } catch (SQLException e) {
-            System.out.println("Ошибка при работе с БД");
-        } catch (CurrencyNotFoundException e) {
-            throw new RuntimeException(e);
+            throw new DataBaseUnavailable("Ошибка выполнения базы данных");
         }
-
-        return exchangeRates;
     }
 
     public Optional<ExchangeRate> findByCurrenciesCode(String baseCurrencyCode, String targetCurrencyCode) {
@@ -51,14 +48,11 @@ public class ExchangeRateDAO {
             if (resultSet.next()) {
                 return Optional.of(mapper.toExchangeRate(resultSet));
             }
+            return Optional.empty();
 
         } catch (SQLException e) {
-            System.out.println("Ошибка при работе с БД");
-        } catch (CurrencyNotFoundException e) {
-            throw new RuntimeException(e);
+            throw new DataBaseUnavailable("Ошибка выполнения базы данных");
         }
-
-        return Optional.empty();
     }
 
     public void save(ExchangeRate exchangeRate) {
@@ -71,7 +65,7 @@ public class ExchangeRateDAO {
 
             statement.executeUpdate(sql);
         } catch (SQLException e) {
-            System.out.println("Ошибка при работе с БД");
+            throw new DataBaseUnavailable("Ошибка выполнения базы данных");
         }
     }
 
@@ -84,7 +78,7 @@ public class ExchangeRateDAO {
 
             statement.executeUpdate(sql);
         } catch (SQLException e) {
-            System.out.println("Ошибка при работе с БД");
+            throw new DataBaseUnavailable("Ошибка выполнения базы данных");
         }
     }
 

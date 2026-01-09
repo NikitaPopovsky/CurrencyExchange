@@ -4,7 +4,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.currency_exchange.db.CurrencyDAO;
 import org.currency_exchange.dto.CurrencyDTO;
 import org.currency_exchange.service.CurrencyService;
 
@@ -21,6 +20,6 @@ public class CurrenciesServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setContentType("application/json");
-        List<CurrencyDTO> currencies = currencyService.getAllCurrencies();
+        List<CurrencyDTO> currencies = currencyService.getAll();
     }
 }

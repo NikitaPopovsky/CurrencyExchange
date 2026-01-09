@@ -15,12 +15,21 @@ public final class CurrencyServiceMapper {
         return currencyDTOList;
     }
 
-    private CurrencyDTO toDTO (Currency currency) {
+    public CurrencyDTO toDTO (Currency currency) {
         CurrencyDTO currencyDTO = new CurrencyDTO();
         currencyDTO.setCode(currency.getCode());
         currencyDTO.setSign(currency.getSign());
         currencyDTO.setFullName(currency.getFullName());
 
         return currencyDTO;
+    }
+
+    public Currency toModel (CurrencyDTO currencyDTO) {
+        Currency currency = new Currency();
+        currency.setCode(currencyDTO.getCode());
+        currency.setSign(currencyDTO.getSign());
+        currency.setFullName(currencyDTO.getFullName());
+
+        return currency;
     }
 }
