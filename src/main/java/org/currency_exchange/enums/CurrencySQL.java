@@ -1,6 +1,6 @@
 package org.currency_exchange.enums;
 
-public enum CurrencySQLQuery {
+public enum CurrencySQL {
     FIND_ALL ("SELECT id, code, full_name, sign FROM currencies"),
     FIND_BY_CODE ("SELECT id, code, full_name, sign FROM currencies WHERE code = ?"),
     FIND_BY_ID ("SELECT id, code, full_name, sign FROM currencies WHERE id = ?"),
@@ -10,7 +10,7 @@ public enum CurrencySQLQuery {
 
     private final String sql;
 
-    CurrencySQLQuery(String sql) {
+    CurrencySQL(String sql) {
         this.sql = sql;
     }
 
