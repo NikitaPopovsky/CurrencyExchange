@@ -1,6 +1,8 @@
 package org.currency_exchange.mapper;
 
 import org.currency_exchange.dto.ExchangeRateDTO;
+import org.currency_exchange.dto.ExchangeRateRequestDTO;
+import org.currency_exchange.model.Currency;
 import org.currency_exchange.model.ExchangeRate;
 
 import java.util.ArrayList;
@@ -16,20 +18,11 @@ public class ExchangeRateServiceMapper {
     }
 
     public ExchangeRateDTO toDTO (ExchangeRate exchangeRate) {
-        ExchangeRateDTO exchangeRateDTO = new ExchangeRateDTO();
-        exchangeRateDTO.setBaseCurrency(exchangeRate.getBaseCurrency());
-        exchangeRateDTO.setTargetCurrency(exchangeRate.getTargetCurrency());
-        exchangeRateDTO.setRate(exchangeRate.getRate());
-
-        return exchangeRateDTO;
+        return new ExchangeRateDTO(0, exchangeRate.baseCurrency(), exchangeRate.targetCurrency(),exchangeRate.rate());
     }
 
     public ExchangeRate toModel (ExchangeRateDTO exchangeRateDTO) {
-        ExchangeRate exchangeRate = new ExchangeRate();
-        exchangeRate.setBaseCurrency(exchangeRateDTO.getBaseCurrency());
-        exchangeRate.setTargetCurrency(exchangeRateDTO.getTargetCurrency());
-        exchangeRate.setRate(exchangeRateDTO.getRate());
-
-        return exchangeRate;
+        return new ExchangeRate(0,exchangeRateDTO.baseCurrency()
+                , exchangeRateDTO.targetCurrency(), exchangeRateDTO.rate());
     }
 }

@@ -3,7 +3,6 @@ package org.currency_exchange.db;
 import org.currency_exchange.enums.ExceptionMessage;
 import org.currency_exchange.enums.ExchangeRateSQL;
 import org.currency_exchange.exception.DataBaseUnavailable;
-import org.currency_exchange.exception.ModelNotFoundException;
 import org.currency_exchange.mapper.ExchangeRateDAOMapper;
 import org.currency_exchange.model.ExchangeRate;
 
@@ -33,7 +32,7 @@ public class ExchangeRateDAO {
         }
     }
 
-    public Optional<ExchangeRate> findByCurrenciesCode(String baseCurrencyCode, String targetCurrencyCode) {
+    public Optional<ExchangeRate> findByPairCodeCurrency(String baseCurrencyCode, String targetCurrencyCode) {
         try {
             String sql = ExchangeRateSQL.FIND_BY_CURRENCIES_CODE.getSql();
             PreparedStatement statement = connection.prepareStatement(sql);
@@ -54,9 +53,9 @@ public class ExchangeRateDAO {
         try {
             String sql = ExchangeRateSQL.SAVE.getSql();
             PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setInt(1,exchangeRate.getBaseCurrency().getId());
-            statement.setInt(2,exchangeRate.getTargetCurrency().getId());
-            statement.setBigDecimal(3,exchangeRate.getRate());
+            statement.setInt(1,exchangeRate.baseCurrency().id());
+            statement.setInt(2,exchangeRate.targetCurrency().id());
+            statement.setBigDecimal(3,exchangeRate.rate());
 
             statement.executeUpdate(sql);
         } catch (SQLException e) {
@@ -69,7 +68,7 @@ public class ExchangeRateDAO {
             String sql = ExchangeRateSQL.UPDATE_RATE.getSql();
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setBigDecimal(1,rate);
-            statement.setInt(1,exchangeRate.getId());
+            statement.setInt(1,exchangeRate.id());
 
             statement.executeUpdate(sql);
         } catch (SQLException e) {

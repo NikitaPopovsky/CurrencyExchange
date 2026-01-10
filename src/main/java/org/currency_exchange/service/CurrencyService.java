@@ -4,6 +4,7 @@ import org.currency_exchange.db.CurrencyDAO;
 import org.currency_exchange.dto.CurrencyDTO;
 import org.currency_exchange.exception.CodeIsMissing;
 import org.currency_exchange.exception.ModelNotFoundException;
+import org.currency_exchange.exception.ObjectAlreadyExists;
 import org.currency_exchange.mapper.CurrencyServiceMapper;
 import org.currency_exchange.model.Currency;
 
@@ -39,7 +40,13 @@ public class CurrencyService {
 
     }
 
-    public void save (CurrencyDTO currencyDTO) {
+    public void create (CurrencyDTO currencyDTO) {
+        Optional <Currency>  currencyOptional = dao.findByCode(currencyDTO.code());
+
+        if (currencyOptional.isPresent()) {
+            throw new ObjectAlreadyExists("Валюта с такими полями уже существет");
+        }
+
         dao.save(mapper.toModel(currencyDTO));
     }
 

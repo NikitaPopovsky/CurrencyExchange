@@ -68,9 +68,9 @@ public class CurrencyDAO {
         try {
             String sql = CurrencySQL.SAVE.getSql();
             PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setString(1,currency.getCode());
-            statement.setString(2,currency.getFullName());
-            statement.setString(3,currency.getSign());
+            statement.setString(1,currency.code());
+            statement.setString(2,currency.fullName());
+            statement.setString(3,currency.sign());
 
             statement.executeUpdate(sql);
         } catch (SQLException e) {
