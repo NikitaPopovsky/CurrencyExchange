@@ -31,21 +31,10 @@ public class ExchangeRateService {
         return mapper.toDtoList(exchangeRates);
     }
 
-    public ExchangeRateDTO getByPairCodeCurrency (String pairCode) {
-        if (pairCode.isEmpty()) {
-            throw new CodeIsMissing("Не указаны коды валют");
-        }
+    public ExchangeRateDTO getByPairCode (String pairCode) {
+        ExchangeRate exchangeRate = getModelByPairCode(pairCode);
 
-        String baseCurrencyCode = pairCode.substring(0,3);
-        String targetCurrencyCode = pairCode.substring(0,6);
-
-        Optional<ExchangeRate> exchangeRateOptional = dao.findByPairCodeCurrency(baseCurrencyCode, targetCurrencyCode);
-
-        if(exchangeRateOptional.isEmpty()) {
-            throw new ModelNotFoundException("Обменный курс не найден");
-        }
-
-        return mapper.toDTO(exchangeRateOptional.get());
+        return mapper.toDTO(exchangeRate);
     }
 
     public void create (ExchangeRateRequestDTO exchangeRateRequestDTO) {
@@ -69,8 +58,27 @@ public class ExchangeRateService {
                 targetCurrencyOptional.get(), exchangeRateRequestDTO.rate())));
     }
 
-    public void updateRate (String codes, BigDecimal rate) {
+    public void updateRate (String pairCode, BigDecimal rate) {
+        ExchangeRate exchangeRate = getModelByPairCode(pairCode);
 
+        dao.updateRate(exchangeRate, rate);
+    }
+
+    private ExchangeRate getModelByPairCode (String pairCode) {
+        if (pairCode.isEmpty()) {
+            throw new CodeIsMissing("Не указаны коды валют");
+        }
+
+        String baseCurrencyCode = pairCode.substring(0,3);
+        String targetCurrencyCode = pairCode.substring(0,6);
+
+        Optional<ExchangeRate> exchangeRateOptional = dao.findByPairCodeCurrency(baseCurrencyCode, targetCurrencyCode);
+
+        if(exchangeRateOptional.isEmpty()) {
+            throw new ModelNotFoundException("Обменный курс не найден");
+        }
+
+        return exchangeRateOptional.get();
     }
 
 
