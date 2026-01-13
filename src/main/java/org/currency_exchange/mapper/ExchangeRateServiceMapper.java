@@ -9,6 +9,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ExchangeRateServiceMapper {
+    private CurrencyServiceMapper currencyMapper;
+
+    public ExchangeRateServiceMapper() {
+        this.currencyMapper = new CurrencyServiceMapper();
+    }
+
     public List<ExchangeRateDTO> toDtoList(List<ExchangeRate> exchangeRates) {
         List <ExchangeRateDTO> exchangeRatesDTO = new ArrayList<>();
         for (ExchangeRate exchangeRate: exchangeRates) {
@@ -18,11 +24,12 @@ public class ExchangeRateServiceMapper {
     }
 
     public ExchangeRateDTO toDTO (ExchangeRate exchangeRate) {
-        return new ExchangeRateDTO(0, exchangeRate.baseCurrency(), exchangeRate.targetCurrency(),exchangeRate.rate());
+                return new ExchangeRateDTO(0, currencyMapper.toDTO(exchangeRate.baseCurrency()),
+                        currencyMapper.toDTO(exchangeRate.targetCurrency()),exchangeRate.rate());
     }
 
     public ExchangeRate toModel (ExchangeRateDTO exchangeRateDTO) {
-        return new ExchangeRate(0,exchangeRateDTO.baseCurrency()
-                , exchangeRateDTO.targetCurrency(), exchangeRateDTO.rate());
+        return new ExchangeRate(0,currencyMapper.toModel(exchangeRateDTO.baseCurrency())
+                , currencyMapper.toModel(exchangeRateDTO.targetCurrency()), exchangeRateDTO.rate());
     }
 }

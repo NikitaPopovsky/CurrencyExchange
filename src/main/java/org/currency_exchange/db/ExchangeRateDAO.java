@@ -68,7 +68,7 @@ public class ExchangeRateDAO {
             String sql = ExchangeRateSQL.UPDATE_RATE.getSql();
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setBigDecimal(1,rate);
-            statement.setInt(1,exchangeRate.id());
+            statement.setInt(2,exchangeRate.id());
 
             statement.executeUpdate(sql);
         } catch (SQLException e) {
