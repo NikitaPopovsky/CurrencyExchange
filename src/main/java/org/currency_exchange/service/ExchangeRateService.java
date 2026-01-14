@@ -10,22 +10,22 @@ import org.currency_exchange.exception.ModelNotFoundException;
 import org.currency_exchange.exception.ObjectAlreadyExists;
 import org.currency_exchange.mapper.ExchangeRateServiceMapper;
 import org.currency_exchange.model.Currency;
+import org.currency_exchange.model.Exchange;
 import org.currency_exchange.model.ExchangeRate;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.math.RoundingMode;
+import java.util.*;
 
 public class ExchangeRateService {
     private final ExchangeRateDAO dao;
     private final ExchangeRateServiceMapper mapper;
-    private final CurrencyDAO daoCurrency;
+    private final CurrencyService currencyService;
 
     public ExchangeRateService() {
         this.dao = new ExchangeRateDAO();
         this.mapper = new ExchangeRateServiceMapper();
-        this.daoCurrency = new CurrencyDAO();
+        this.currencyService = new CurrencyService();
     }
 
     public List<ExchangeRateDTO> getAll() {
@@ -41,6 +41,9 @@ public class ExchangeRateService {
     }
 
     public void create (ExchangeRateRequestDTO exchangeRateRequestDTO) {
+        Currency baseCurrency;
+        Currency targetCurrency;
+
         String baseCurrencyCode = exchangeRateRequestDTO.baseCurrencyCode();
         String targetCurrencyCode = exchangeRateRequestDTO.targetCurrencyCode();
 
@@ -50,17 +53,15 @@ public class ExchangeRateService {
             throw new ObjectAlreadyExists("Обменный курс с такими полями уже существует");
         }
 
-        Optional <Currency> baseCurrencyOptional = daoCurrency.findByCode(baseCurrencyCode);
-        Optional <Currency> targetCurrencyOptional = daoCurrency.findByCode(targetCurrencyCode);
-
-        if (baseCurrencyOptional.isEmpty() || targetCurrencyOptional.isEmpty()) {
+        try {
+            baseCurrency = currencyService.getModelByCode(baseCurrencyCode);
+            targetCurrency = currencyService.getModelByCode(targetCurrencyCode);
+        } catch (RuntimeException e) {
             throw new ModelNotFoundException("Одна (или обе) валюта из валютной пары не существует в БД");
         }
 
-
-
-        dao.save(new ExchangeRate(0,baseCurrencyOptional.get(),
-                targetCurrencyOptional.get(), exchangeRateRequestDTO.rate()));
+        dao.save(new ExchangeRate(0,baseCurrency,
+                targetCurrency, exchangeRateRequestDTO.rate()));
     }
 
     public void updateRate (String pairCode, BigDecimal rate) {
@@ -72,18 +73,63 @@ public class ExchangeRateService {
 
     public ExchangeDTO exchange(String baseCurrencyCode , String targetCurrencyCode, BigDecimal amount) {
 
+        ExchangeRate exchangeRate = findForExchange(baseCurrencyCode, targetCurrencyCode);
+
+        return mapper.toExchangeDTO(exchangeRate, amount);
     }
 
-    private ExchangeRate getModelByCodes (HashMap<String, String> codes) {
+    private ExchangeRate findForExchange(String baseCurrencyCode , String targetCurrencyCode) {
+        Map<String, String> codes = new HashMap<>();
 
-        Optional<ExchangeRate> exchangeRateOptional = dao.findByPairCodeCurrency(codes.get("baseCurrencyCode")
-                , codes.get("targetCurrencyCode"));
+        try {
+            codes.put("from", baseCurrencyCode);
+            codes.put("to", targetCurrencyCode);
 
-        if(exchangeRateOptional.isEmpty()) {
-            throw new ModelNotFoundException("Обменный курс не найден");
+            return getModelByCodes(codes);
+        } catch (ModelNotFoundException e) {
+            //ничего не делаем
         }
 
-        return exchangeRateOptional.get();
+        try {
+            codes.put("from", targetCurrencyCode);
+            codes.put("to", baseCurrencyCode);
+
+            ExchangeRate exchangeRate = getModelByCodes(codes);
+            BigDecimal rate = BigDecimal.ONE.divide(exchangeRate.rate(), 3 , RoundingMode.HALF_UP);
+
+            return new ExchangeRate(0, exchangeRate.targetCurrency(), exchangeRate.baseCurrency(),  rate);
+        } catch (ModelNotFoundException e) {
+            //ничего не делаем
+        }
+
+        try {
+            codes.put("from", "USD");
+            codes.put("to", baseCurrencyCode);
+
+            ExchangeRate exchangeRateUSDToBase = getModelByCodes(codes);
+
+            codes.put("from", "USD");
+            codes.put("to", targetCurrencyCode);
+
+            ExchangeRate exchangeRateUSDToTarget = getModelByCodes(codes);
+
+            BigDecimal rate = exchangeRateUSDToBase.rate()
+                    .divide(exchangeRateUSDToTarget.rate(), 3, RoundingMode.HALF_UP);
+
+            return new ExchangeRate(0, exchangeRateUSDToBase.targetCurrency(),
+                    exchangeRateUSDToTarget.targetCurrency(),  rate);
+
+        } catch (RuntimeException e) {
+            throw e;
+        }
+
+    }
+
+    private ExchangeRate getModelByCodes (Map<String, String> codes) throws ModelNotFoundException{
+        Optional<ExchangeRate> exchangeRateOptional = dao.findByPairCodeCurrency(codes.get("from")
+                , codes.get("to"));
+
+        return exchangeRateOptional.orElseThrow(() -> new ModelNotFoundException("Обменный курс не найден"));
     }
 
     private HashMap<String, String> splitCodes(String pairCode) {
@@ -92,8 +138,8 @@ public class ExchangeRateService {
         }
 
         HashMap<String, String> codes = new HashMap <String, String>();
-        codes.put("baseCurrencyCode", pairCode.substring(0,3));
-        codes.put("targetCurrencyCode", pairCode.substring(3,6));
+        codes.put("from", pairCode.substring(0,3));
+        codes.put("to", pairCode.substring(3,6));
 
         return codes;
     }

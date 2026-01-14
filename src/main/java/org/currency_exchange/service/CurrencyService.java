@@ -25,19 +25,8 @@ public class CurrencyService {
         return mapper.toDtoList(currencies);
     }
 
-    public CurrencyDTO getByCode(String code) throws ModelNotFoundException {
-        if (code.isEmpty()) {
-            throw new CodeIsMissing("Не указан код валюты");
-        }
-
-        Optional <Currency> currencyOptional = dao.findByCode(code);
-
-        if(currencyOptional.isEmpty()) {
-            throw new ModelNotFoundException("Валюта не найдена");
-        }
-
-        return mapper.toDTO(currencyOptional.get());
-
+    public CurrencyDTO getByCode(String code) {
+        return mapper.toDTO(getModelByCode(code));
     }
 
     public void create (CurrencyDTO currencyDTO) {
@@ -50,5 +39,12 @@ public class CurrencyService {
         dao.save(mapper.toModel(currencyDTO));
     }
 
+    public Currency getModelByCode(String code) throws ModelNotFoundException {
+        if (code.isEmpty()) {
+            throw new CodeIsMissing("Не указан код валюты");
+        }
+        Optional <Currency> currencyOptional = dao.findByCode(code);
 
+        return currencyOptional.orElseThrow(() -> new ModelNotFoundException("Валюта не найдена"));
+    }
 }
