@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS currencies (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    code VARCHAR(3) NOT NULL,
+    code VARCHAR(3) NOT NULL UNIQUE,
     full_name VARCHAR(50) NOT NULL,
     sign VARCHAR(3) NOT NULL
 );
@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS exchange_rates (
     FOREIGN KEY (target_currency_id) REFERENCES currencies(id)
 );
 
-# insert into currencies (code, full_name, sign) values ('AUD', 'Australian dollar', 'A$');
-# insert into currencies (code, full_name, sign) values ('EUR', 'Euro', '€');
-# insert into currencies (code, full_name, sign) values ('RUB', 'Rubil', 'R')
+INSERT INTO currencies (code, full_name, sign) VALUES
+    ('USD', 'US Dollar', '$'),
+    ('EUR', 'Euro', '€'),
+    ('RUB', 'Russian Ruble', '₽');

@@ -4,14 +4,6 @@
 
 <web-app>
   <display-name>Archetype Created Web Application</display-name>
-<servlet>
-  <servlet-name>CurrenciesServlet</servlet-name>
-    <servlet-class>org.currency_exchange.servlet.CurrenciesServlet</servlet-class>
-</servlet>
-  <servlet-mapping>
-    <servlet-name>CurrenciesServlet</servlet-name>
-    <url-pattern>/currencies</url-pattern>
-  </servlet-mapping>
 </web-app>
 
 

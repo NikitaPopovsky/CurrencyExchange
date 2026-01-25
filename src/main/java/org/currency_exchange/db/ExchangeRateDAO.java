@@ -38,7 +38,7 @@ public class ExchangeRateDAO {
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setString(1,baseCurrencyCode);
             statement.setString(2,targetCurrencyCode);
-            ResultSet resultSet = statement.executeQuery(sql);
+            ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
                 return Optional.of(mapper.toExchangeRate(resultSet));
             }
@@ -49,28 +49,43 @@ public class ExchangeRateDAO {
         }
     }
 
-    public void save(ExchangeRate exchangeRate) {
+    public ExchangeRate save(ExchangeRate exchangeRate) {
         try {
             String sql = ExchangeRateSQL.SAVE.getSql();
-            PreparedStatement statement = connection.prepareStatement(sql);
+            PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             statement.setInt(1,exchangeRate.baseCurrency().id());
             statement.setInt(2,exchangeRate.targetCurrency().id());
             statement.setBigDecimal(3,exchangeRate.rate());
 
-            statement.executeUpdate();
+            int countRecords = statement.executeUpdate();
+            if (countRecords != 0) {
+                ResultSet resultSet = statement.getGeneratedKeys();
+                resultSet.next();
+                int id = resultSet.getInt(1);
+                return new ExchangeRate(id,exchangeRate.baseCurrency()
+                        ,exchangeRate.targetCurrency(),exchangeRate.rate());
+            } else {
+                throw new SQLException();
+            }
         } catch (SQLException e) {
             throw new DataBaseUnavailable(ExceptionMessage.DB_NOT_UNAVAILABLE.getMessage());
         }
     }
 
-    public void updateRate (ExchangeRate exchangeRate, BigDecimal rate) {
+    public ExchangeRate updateRate (ExchangeRate exchangeRate, BigDecimal rate) {
         try {
             String sql = ExchangeRateSQL.UPDATE_RATE.getSql();
-            PreparedStatement statement = connection.prepareStatement(sql);
+            PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             statement.setBigDecimal(1,rate);
             statement.setInt(2,exchangeRate.id());
 
-            statement.executeUpdate();
+            int countRecords = statement.executeUpdate();
+            if (countRecords != 0) {
+                return new ExchangeRate(exchangeRate.id(),exchangeRate.baseCurrency()
+                        ,exchangeRate.targetCurrency(),rate);
+            } else {
+                throw new SQLException();
+            }
         } catch (SQLException e) {
             throw new DataBaseUnavailable(ExceptionMessage.DB_NOT_UNAVAILABLE.getMessage());
         }

@@ -40,7 +40,7 @@ public class ExchangeRateService {
         return mapper.toDTO(exchangeRate);
     }
 
-    public void create (ExchangeRateRequestDTO exchangeRateRequestDTO) {
+    public ExchangeRateDTO create (ExchangeRateRequestDTO exchangeRateRequestDTO) {
         Currency baseCurrency;
         Currency targetCurrency;
 
@@ -60,15 +60,19 @@ public class ExchangeRateService {
             throw new ModelNotFoundException("Одна (или обе) валюта из валютной пары не существует в БД");
         }
 
-        dao.save(new ExchangeRate(0,baseCurrency,
+        ExchangeRate exchangeRate = dao.save(new ExchangeRate(0,baseCurrency,
                 targetCurrency, exchangeRateRequestDTO.rate()));
+
+        return mapper.toDTO(exchangeRate);
     }
 
-    public void updateRate (String pairCode, BigDecimal rate) {
+    public ExchangeRateDTO updateRate (String pairCode, BigDecimal rate) {
         HashMap<String, String> codes = splitCodes(pairCode);
         ExchangeRate exchangeRate = getModelByCodes(codes);
 
-        dao.updateRate(exchangeRate, rate);
+        exchangeRate = dao.updateRate(exchangeRate, rate);
+        return mapper.toDTO(exchangeRate);
+
     }
 
     public ExchangeDTO exchange(String baseCurrencyCode , String targetCurrencyCode, BigDecimal amount) {

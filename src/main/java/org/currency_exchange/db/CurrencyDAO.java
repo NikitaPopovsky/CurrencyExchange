@@ -50,7 +50,7 @@ public class CurrencyDAO {
 
     public Optional<Currency> findById (int id) {
         try {
-            String sql = CurrencySQL.FIND_BY_CODE.getSql();
+            String sql = CurrencySQL.FIND_BY_ID.getSql();
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setInt(1,id);
             ResultSet resultSet = statement.executeQuery();
