@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ExchangeRateServiceMapper {
-    private CurrencyServiceMapper currencyMapper;
+    private final CurrencyServiceMapper currencyMapper;
 
     public ExchangeRateServiceMapper() {
         this.currencyMapper = new CurrencyServiceMapper();
@@ -27,12 +27,12 @@ public class ExchangeRateServiceMapper {
     }
 
     public ExchangeRateDTO toDTO (ExchangeRate exchangeRate) {
-                return new ExchangeRateDTO(0, currencyMapper.toDTO(exchangeRate.baseCurrency()),
+                return new ExchangeRateDTO(exchangeRate.id(), currencyMapper.toDTO(exchangeRate.baseCurrency()),
                         currencyMapper.toDTO(exchangeRate.targetCurrency()),exchangeRate.rate());
     }
 
     public ExchangeRate toModel (ExchangeRateDTO exchangeRateDTO) {
-        return new ExchangeRate(0,currencyMapper.toModel(exchangeRateDTO.baseCurrency())
+        return new ExchangeRate(exchangeRateDTO.id(),currencyMapper.toModel(exchangeRateDTO.baseCurrency())
                 , currencyMapper.toModel(exchangeRateDTO.targetCurrency()), exchangeRateDTO.rate());
     }
 

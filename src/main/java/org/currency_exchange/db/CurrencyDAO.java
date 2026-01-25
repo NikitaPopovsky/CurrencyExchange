@@ -37,7 +37,7 @@ public class CurrencyDAO {
             String sql = CurrencySQL.FIND_BY_CODE.getSql();
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setString(1,code);
-            ResultSet resultSet = statement.executeQuery(sql);
+            ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
                 return Optional.of(mapper.toCurrency(resultSet));
             }
@@ -53,7 +53,7 @@ public class CurrencyDAO {
             String sql = CurrencySQL.FIND_BY_CODE.getSql();
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setInt(1,id);
-            ResultSet resultSet = statement.executeQuery(sql);
+            ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
                 return Optional.of(mapper.toCurrency(resultSet));
             }
@@ -64,15 +64,28 @@ public class CurrencyDAO {
         }
     }
 
-    public void save (Currency currency) {
+    public Currency save (Currency currency) {
         try {
             String sql = CurrencySQL.SAVE.getSql();
-            PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setString(1,currency.code());
-            statement.setString(2,currency.fullName());
-            statement.setString(3,currency.sign());
+            PreparedStatement statement = connection.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS);
+            String code = currency.code();
+            String fullName = currency.fullName();
+            String sign = currency.sign();
 
-            statement.executeUpdate(sql);
+            statement.setString(1,code);
+            statement.setString(2,fullName);
+            statement.setString(3,sign);
+
+            int countRecord = statement.executeUpdate();
+            if (countRecord != 0) {
+                ResultSet resultSet = statement.getGeneratedKeys();
+                resultSet.next();
+                int id = resultSet.getInt(1);
+
+                return(new Currency(id,code,fullName,sign));
+            } else {
+                throw new SQLException();
+            }
         } catch (SQLException e) {
             throw new DataBaseUnavailable(ExceptionMessage.DB_NOT_UNAVAILABLE.getMessage());
         }

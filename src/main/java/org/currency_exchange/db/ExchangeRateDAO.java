@@ -57,7 +57,7 @@ public class ExchangeRateDAO {
             statement.setInt(2,exchangeRate.targetCurrency().id());
             statement.setBigDecimal(3,exchangeRate.rate());
 
-            statement.executeUpdate(sql);
+            statement.executeUpdate();
         } catch (SQLException e) {
             throw new DataBaseUnavailable(ExceptionMessage.DB_NOT_UNAVAILABLE.getMessage());
         }
@@ -70,7 +70,7 @@ public class ExchangeRateDAO {
             statement.setBigDecimal(1,rate);
             statement.setInt(2,exchangeRate.id());
 
-            statement.executeUpdate(sql);
+            statement.executeUpdate();
         } catch (SQLException e) {
             throw new DataBaseUnavailable(ExceptionMessage.DB_NOT_UNAVAILABLE.getMessage());
         }

@@ -16,10 +16,10 @@ public final class CurrencyServiceMapper {
     }
 
     public CurrencyDTO toDTO (Currency currency) {
-        return new CurrencyDTO(0, currency.code(), currency.sign(), currency.fullName());
+        return new CurrencyDTO(currency.id(), currency.code(), currency.fullName(), currency.sign());
     }
 
     public Currency toModel (CurrencyDTO currencyDTO) {
-        return new Currency(0, currencyDTO.code(), currencyDTO.sign(), currencyDTO.fullName());
+        return new Currency(currencyDTO.id(), currencyDTO.code(), currencyDTO.name(), currencyDTO.sign());
     }
 }

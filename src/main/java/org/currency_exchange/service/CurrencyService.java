@@ -29,14 +29,15 @@ public class CurrencyService {
         return mapper.toDTO(getModelByCode(code));
     }
 
-    public void create (CurrencyDTO currencyDTO) {
+    public CurrencyDTO create (CurrencyDTO currencyDTO) {
         Optional <Currency>  currencyOptional = dao.findByCode(currencyDTO.code());
 
         if (currencyOptional.isPresent()) {
             throw new ObjectAlreadyExists("Валюта с такими полями уже существет");
         }
 
-        dao.save(mapper.toModel(currencyDTO));
+        Currency currency = dao.save(mapper.toModel(currencyDTO));
+        return mapper.toDTO(currency);
     }
 
     public Currency getModelByCode(String code) throws ModelNotFoundException {

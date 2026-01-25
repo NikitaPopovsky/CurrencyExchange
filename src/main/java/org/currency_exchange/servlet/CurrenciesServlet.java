@@ -30,6 +30,12 @@ public class CurrenciesServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        super.doPost(req, resp);
+        String name = req.getParameter("name");
+        String code = req.getParameter("code");
+        String sign = req.getParameter("sign");
+
+        CurrencyDTO currencyDTO = currencyService.create(new CurrencyDTO(0,code, name, sign));
+        resp.setStatus(HttpServletResponse.SC_OK);
+        JSONMapper.writeValue(resp.getWriter(),currencyDTO);
     }
 }
