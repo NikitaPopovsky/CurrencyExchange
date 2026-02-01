@@ -24,15 +24,16 @@ public class ExchangeRateServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String codes = req.getPathInfo();
+        String codes = req.getPathInfo().replace("/","");
         ExchangeRateDTO exchangeRateDTO = exchangeRateService.getByPairCode(codes);
         resp.setStatus(HttpServletResponse.SC_OK);
         JSONMapper.writeValue(resp.getWriter(),exchangeRateDTO);
     }
 
+
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String codes = req.getPathInfo();
+    protected void doPatch(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String codes = req.getPathInfo().replace("/","");
         BigDecimal rate = new BigDecimal(req.getParameter("rate"));
 
         ExchangeRateDTO exchangeRateDTO = exchangeRateService.updateRate(codes, rate);

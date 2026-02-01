@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 
-@WebServlet ("/")
+@WebServlet ("/exchangeRates")
 public class ExchangeRatesServlet extends HttpServlet {
     private final ExchangeRateService exchangeRateService;
     private final ObjectMapper JSONMapper;
