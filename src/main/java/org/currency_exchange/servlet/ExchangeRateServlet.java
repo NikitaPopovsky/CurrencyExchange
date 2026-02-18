@@ -11,6 +11,7 @@ import org.currency_exchange.service.ExchangeRateService;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.stream.Collectors;
 
 @WebServlet ("/exchangeRate/*")
 public class ExchangeRateServlet extends HttpServlet {
@@ -34,7 +35,8 @@ public class ExchangeRateServlet extends HttpServlet {
     @Override
     protected void doPatch(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String codes = req.getPathInfo().replace("/","");
-        BigDecimal rate = new BigDecimal(req.getParameter("rate"));
+        String body = req.getReader().lines().collect(Collectors.joining());
+        BigDecimal rate = new BigDecimal(body.replace("rate=", ""));
 
         ExchangeRateDTO exchangeRateDTO = exchangeRateService.updateRate(codes, rate);
         resp.setStatus(HttpServletResponse.SC_OK);
