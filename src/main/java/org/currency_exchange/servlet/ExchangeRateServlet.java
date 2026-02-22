@@ -6,6 +6,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.currency_exchange.ValidationUtil;
 import org.currency_exchange.dto.ExchangeRateDTO;
 import org.currency_exchange.service.ExchangeRateService;
 
@@ -26,6 +27,9 @@ public class ExchangeRateServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String codes = req.getPathInfo().replace("/","");
+
+        ValidationUtil.validationPairCode(codes);
+
         ExchangeRateDTO exchangeRateDTO = exchangeRateService.getByPairCode(codes);
         resp.setStatus(HttpServletResponse.SC_OK);
         JSONMapper.writeValue(resp.getWriter(),exchangeRateDTO);
@@ -36,7 +40,12 @@ public class ExchangeRateServlet extends HttpServlet {
     protected void doPatch(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String codes = req.getPathInfo().replace("/","");
         String body = req.getReader().lines().collect(Collectors.joining());
-        BigDecimal rate = new BigDecimal(body.replace("rate=", ""));
+        String stringRate = body.replace("rate=", "");
+
+        ValidationUtil.validationPairCode(codes);
+        ValidationUtil.validationRate(stringRate);
+
+        BigDecimal rate = new BigDecimal(stringRate);
 
         ExchangeRateDTO exchangeRateDTO = exchangeRateService.updateRate(codes, rate);
         resp.setStatus(HttpServletResponse.SC_OK);

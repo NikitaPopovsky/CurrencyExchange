@@ -6,6 +6,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.currency_exchange.ValidationUtil;
 import org.currency_exchange.dto.CurrencyDTO;
 import org.currency_exchange.service.CurrencyService;
 
@@ -35,6 +36,8 @@ public class CurrenciesServlet extends HttpServlet {
         String name = req.getParameter("name");
         String code = req.getParameter("code");
         String sign = req.getParameter("sign");
+
+        ValidationUtil.validationCurrencyData(name, code, sign);
 
         CurrencyDTO currencyDTO = currencyService.create(new CurrencyDTO(0,code, name, sign));
         resp.setStatus(HttpServletResponse.SC_OK);

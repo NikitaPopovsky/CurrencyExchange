@@ -1,14 +1,14 @@
 package org.currency_exchange.exception;
 
 public abstract class CurrencyExchangeException extends RuntimeException {
-    private final String statusCode;
+    private final int statusCode;
 
-    public CurrencyExchangeException(String message, String statusCode) {
+    public CurrencyExchangeException(String message, int statusCode) {
         super(message);
         this.statusCode = statusCode;
     }
 
-    public String getStatusCode() {
+    public int getStatusCode() {
         return statusCode;
     }
 }

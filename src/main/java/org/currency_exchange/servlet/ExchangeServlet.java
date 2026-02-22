@@ -6,6 +6,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.currency_exchange.ValidationUtil;
 import org.currency_exchange.dto.ExchangeDTO;
 import org.currency_exchange.service.ExchangeRateService;
 
@@ -26,7 +27,11 @@ public class ExchangeServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String from = req.getParameter("from");
         String to = req.getParameter("to");
-        BigDecimal amount = new BigDecimal(req.getParameter("amount"));
+        String stringAmount = req.getParameter("amount");
+
+        ValidationUtil.validationExchangeData(from, to, stringAmount);
+
+        BigDecimal amount = new BigDecimal(stringAmount);
 
         ExchangeDTO exchangeDTO = exchangeRateService.exchange(from, to, amount);
         resp.setStatus(HttpServletResponse.SC_OK);

@@ -6,6 +6,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.currency_exchange.ValidationUtil;
 import org.currency_exchange.dto.CurrencyDTO;
 import org.currency_exchange.dto.ExchangeRateDTO;
 import org.currency_exchange.dto.ExchangeRateRequestDTO;
@@ -38,7 +39,11 @@ public class ExchangeRatesServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String baseCurrencyCode = req.getParameter("baseCurrencyCode");
         String targetCurrencyCode  = req.getParameter("targetCurrencyCode");
-        BigDecimal rate  = new BigDecimal(req.getParameter("rate"));
+        String stringRate = req.getParameter("rate");
+
+        ValidationUtil.validationExchangeRateData(baseCurrencyCode, targetCurrencyCode, stringRate);
+
+        BigDecimal rate  = new BigDecimal(stringRate);
 
         ExchangeRateDTO exchangeRateDTO = exchangeRateService.create(new ExchangeRateRequestDTO(baseCurrencyCode
                 , targetCurrencyCode, rate));

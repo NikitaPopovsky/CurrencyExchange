@@ -6,6 +6,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.currency_exchange.ValidationUtil;
 import org.currency_exchange.dto.CurrencyDTO;
 import org.currency_exchange.service.CurrencyService;
 
@@ -24,6 +25,9 @@ public class CurrencyServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String code = req.getPathInfo().replace("/","");
+
+        ValidationUtil.validationCode(code);
+
         CurrencyDTO currencyDTO = currencyService.getByCode(code);
 
         resp.setStatus(HttpServletResponse.SC_OK);
