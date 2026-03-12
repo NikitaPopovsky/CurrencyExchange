@@ -6,7 +6,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.currency_exchange.ValidationUtil;
+import org.currency_exchange.util.ValidationUtil;
 import org.currency_exchange.dto.ExchangeRateDTO;
 import org.currency_exchange.service.ExchangeRateService;
 

@@ -15,7 +15,7 @@ import java.util.Properties;
 public class UtilDAO {
     static {
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
+            Class.forName("org.postgresql.Driver");
         } catch (ClassNotFoundException e) {
             throw new DataBaseUnavailable("Ошибка драйвера подключения к БД");
         }
@@ -30,8 +30,6 @@ public class UtilDAO {
         }
 
         try {
-            //Class.forName("mysql.Driver");
-            //DriverManager.registerDriver(new com.mysql.jdbc.Driver());
             connection = DriverManager.getConnection(config.get("url"), config.get("user"), config.get("password"));
             if (connection == null) {
                 throw new DataBaseUnavailable("Ошибка получения соединения с БД");

@@ -1,4 +1,4 @@
-package org.currency_exchange;
+package org.currency_exchange.util;
 
 import org.currency_exchange.exception.CodeIsMissing;
 
@@ -30,7 +30,7 @@ public final class ValidationUtil {
         if (code.length() != 3) {
             throw new CodeIsMissing("Длина кода валюты должна быть 3 символа");
         }
-        if (!code.matches("[A-Z]")) {
+        if (!code.matches("[A-Z]+")) {
             throw new CodeIsMissing("Код должен содержать только латинские заглавные буквы");
         }
     }
@@ -42,7 +42,7 @@ public final class ValidationUtil {
         if (name.length() > 50) {
             throw new CodeIsMissing("Имя валюты не должно превышать 50 символов");
         }
-        if (!name.matches("[a-zA-Z\\s]")) {
+        if (!name.matches("[a-zA-Z\\s]+")) {
             throw new CodeIsMissing("Имя валюты может содержать только латинские буквы");
         }
     }
@@ -54,7 +54,7 @@ public final class ValidationUtil {
         if (sign.length() != 1) {
             throw new CodeIsMissing("Знак валюты должен содержать 1 символ");
         }
-        if (!sign.matches("[A-Z\\p{Sc}]")) {
+        if (!sign.matches("[A-Z\\p{Sc}]+")) {
             throw new CodeIsMissing("Знак валюты может состоять из заглавной латинской буквы или символа валюты");
         }
     }
