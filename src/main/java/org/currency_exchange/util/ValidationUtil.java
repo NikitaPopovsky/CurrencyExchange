@@ -76,7 +76,7 @@ public final class ValidationUtil {
         if (pairCode.length() != 6) {
             throw new CodeIsMissing("Длина пары кодов валют должна быть 6 символов");
         }
-        if (!pairCode.matches("[A-Z]")) {
+        if (!pairCode.matches("[A-Z]+")) {
             throw new CodeIsMissing("Пара кодов должна содержать только латинские заглавные буквы");
         }
     }
@@ -88,10 +88,10 @@ public final class ValidationUtil {
 
         BigDecimal rate = new BigDecimal(stringNum);
 
-        if (rate != null) {
+        if (rate == null) {
             throw new CodeIsMissing(String.format("%s не указан", fieldName));
         }
-        if (rate.compareTo(BigDecimal.ZERO) > 0)  {
+        if (rate.compareTo(BigDecimal.ZERO) <= 0)  {
             throw new CodeIsMissing(String.format("%s должен быть больше нуля", fieldName));
         }
 
