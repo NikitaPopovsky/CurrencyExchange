@@ -1,4 +1,4 @@
-🪙 Currency Exchange Service
+₽ → $ Currency Exchange Service
 REST API + Web UI для управления валютами и курсами обмена
 ✅ Jakarta Servlet 6 (Tomcat 11) • ✅ PostgreSQL • ✅ Bootstrap 5 • ✅ jQuery
 
