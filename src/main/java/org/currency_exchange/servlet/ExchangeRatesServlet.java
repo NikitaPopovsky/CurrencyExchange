@@ -6,6 +6,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.currency_exchange.util.ResponseBuilderUtil;
 import org.currency_exchange.util.ValidationUtil;
 import org.currency_exchange.dto.ExchangeRateDTO;
 import org.currency_exchange.dto.ExchangeRateRequestDTO;
@@ -18,22 +19,19 @@ import java.util.List;
 @WebServlet ("/exchangeRates")
 public class ExchangeRatesServlet extends HttpServlet {
     private final ExchangeRateService exchangeRateService;
-    private final ObjectMapper JSONMapper;
 
     public ExchangeRatesServlet() {
         this.exchangeRateService = new ExchangeRateService();
-        this.JSONMapper = new ObjectMapper();
     }
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         List<ExchangeRateDTO> exchangeRateDTOList = exchangeRateService.getAll();
-        resp.setStatus(HttpServletResponse.SC_OK);
-        JSONMapper.writeValue(resp.getWriter(),exchangeRateDTOList);
+        ResponseBuilderUtil.writeResponse(resp, exchangeRateDTOList);
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String baseCurrencyCode = req.getParameter("baseCurrencyCode");
         String targetCurrencyCode  = req.getParameter("targetCurrencyCode");
         String stringRate = req.getParameter("rate");
@@ -44,7 +42,6 @@ public class ExchangeRatesServlet extends HttpServlet {
 
         ExchangeRateDTO exchangeRateDTO = exchangeRateService.create(new ExchangeRateRequestDTO(baseCurrencyCode
                 , targetCurrencyCode, rate));
-        resp.setStatus(HttpServletResponse.SC_OK);
-        JSONMapper.writeValue(resp.getWriter(),exchangeRateDTO);
+        ResponseBuilderUtil.writeResponse(resp, exchangeRateDTO);
     }
 }

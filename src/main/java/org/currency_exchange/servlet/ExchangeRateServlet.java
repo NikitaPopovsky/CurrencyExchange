@@ -6,6 +6,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.currency_exchange.util.ResponseBuilderUtil;
 import org.currency_exchange.util.ValidationUtil;
 import org.currency_exchange.dto.ExchangeRateDTO;
 import org.currency_exchange.service.ExchangeRateService;
@@ -17,27 +18,24 @@ import java.util.stream.Collectors;
 @WebServlet ("/exchangeRate/*")
 public class ExchangeRateServlet extends HttpServlet {
     private final ExchangeRateService exchangeRateService;
-    private final ObjectMapper JSONMapper;
 
     public ExchangeRateServlet() {
         this.exchangeRateService = new ExchangeRateService();
-        this.JSONMapper = new ObjectMapper();
     }
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String codes = req.getPathInfo().replace("/","");
 
         ValidationUtil.validationPairCode(codes);
 
         ExchangeRateDTO exchangeRateDTO = exchangeRateService.getByPairCode(codes);
-        resp.setStatus(HttpServletResponse.SC_OK);
-        JSONMapper.writeValue(resp.getWriter(),exchangeRateDTO);
+        ResponseBuilderUtil.writeResponse(resp, exchangeRateDTO);
     }
 
 
     @Override
-    protected void doPatch(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPatch(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String codes = req.getPathInfo().replace("/","");
         String body = req.getReader().lines().collect(Collectors.joining());
         String stringRate = body.replace("rate=", "");
@@ -48,7 +46,6 @@ public class ExchangeRateServlet extends HttpServlet {
         BigDecimal rate = new BigDecimal(stringRate);
 
         ExchangeRateDTO exchangeRateDTO = exchangeRateService.updateRate(codes, rate);
-        resp.setStatus(HttpServletResponse.SC_OK);
-        JSONMapper.writeValue(resp.getWriter(),exchangeRateDTO);
+        ResponseBuilderUtil.writeResponse(resp, exchangeRateDTO);
     }
 }

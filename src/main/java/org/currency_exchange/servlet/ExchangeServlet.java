@@ -6,6 +6,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.currency_exchange.util.ResponseBuilderUtil;
 import org.currency_exchange.util.ValidationUtil;
 import org.currency_exchange.dto.ExchangeDTO;
 import org.currency_exchange.service.ExchangeRateService;
@@ -16,15 +17,13 @@ import java.math.BigDecimal;
 @WebServlet("/exchange")
 public class ExchangeServlet extends HttpServlet {
     private final ExchangeRateService exchangeRateService;
-    private final ObjectMapper JSONMapper;
 
     public ExchangeServlet() {
         this.exchangeRateService = new ExchangeRateService();
-        this.JSONMapper = new ObjectMapper();
     }
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String from = req.getParameter("from");
         String to = req.getParameter("to");
         String stringAmount = req.getParameter("amount");
@@ -34,7 +33,6 @@ public class ExchangeServlet extends HttpServlet {
         BigDecimal amount = new BigDecimal(stringAmount);
 
         ExchangeDTO exchangeDTO = exchangeRateService.exchange(from, to, amount);
-        resp.setStatus(HttpServletResponse.SC_OK);
-        JSONMapper.writeValue(resp.getWriter(),exchangeDTO);
+        ResponseBuilderUtil.writeResponse(resp, exchangeDTO);
     }
 }
