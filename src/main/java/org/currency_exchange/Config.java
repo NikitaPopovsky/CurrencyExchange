@@ -3,7 +3,8 @@ package org.currency_exchange;
 public enum Config {
     PATH_CONFIG_PROPERTIES("src/main/resources/config.properties"),
     CONFIG_PROPERTIES("config.properties"),
-    SCHEMA("schema.sql");
+    SCHEMA("schema.sql"),
+    DRIVER_BD("org.postgresql.Driver");
 
     private final String value;
 

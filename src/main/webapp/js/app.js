@@ -191,7 +191,7 @@ $(document).ready(function() {
             type: "GET",
             // data: "$("#add-exchange-rate").serialize()",
             success: function(data) {
-                data = JSON.parse(data);
+                //data = JSON.parse(data);
                 $("#convert-converted-amount").val(data.convertedAmount);
             },
             error: function(jqXHR, textStatus, errorThrown) {
