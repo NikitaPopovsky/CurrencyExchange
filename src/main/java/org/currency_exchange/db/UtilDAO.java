@@ -1,66 +1,63 @@
 package org.currency_exchange.db;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import org.currency_exchange.Config;
 import org.currency_exchange.exception.DataBaseUnavailable;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 
 public class UtilDAO {
+    private static final HikariDataSource dataSource;
+
     static {
         try {
-            Class.forName("org.postgresql.Driver");
+            Class.forName(Config.DRIVER_BD.getValue());
         } catch (ClassNotFoundException e) {
             throw new DataBaseUnavailable("Ошибка драйвера подключения к БД");
         }
 
-    }
-    public static Connection getConnection(){
-        Connection connection = null;
-        Map <String, String> config = getConfig();
-
-        if (config.isEmpty()) {
-            return connection;
+        try {
+            dataSource = new HikariDataSource(getConfig());
+        } catch (Exception e) {
+            throw new DataBaseUnavailable("Ошибка инициализации пула подключений: " + e.getMessage());
         }
 
+    }
+    public static Connection getConnection() {
         try {
-            connection = DriverManager.getConnection(config.get("url"), config.get("user"), config.get("password"));
-            if (connection == null) {
-                throw new DataBaseUnavailable("Ошибка получения соединения с БД");
-            }
+            return dataSource.getConnection();
         } catch (SQLException e) {
             throw new DataBaseUnavailable("Ошибка получения соединения с БД");
         }
-
-        return connection;
     }
 
-    private static Map<String,String> getConfig() {
-        Map <String, String> config = new HashMap<>();
+    private static HikariConfig getConfig() {
         Properties properties = new Properties();
-        String url;
-        String user;
-        String password;
-
         try {
             InputStream inputStream = UtilDAO.class.getClassLoader().getResourceAsStream(Config.CONFIG_PROPERTIES.getValue());
             properties.load(inputStream);
-            url = properties.getProperty("db.url");
-            user = properties.getProperty("db.user");
-            password = properties.getProperty("db.password");
         } catch (IOException e) {
             throw new DataBaseUnavailable("Ошибка получения конфигурационных данных");
         }
+        String url = properties.getProperty("db.url");
+        String user = properties.getProperty("db.user");
+        String password = properties.getProperty("db.password");
 
-        config.put("url", url);
-        config.put("user", user);
-        config.put("password", password);
+        HikariConfig config = new HikariConfig();
+        config.setJdbcUrl(url);
+        config.setUsername(user);
+        config.setPassword(password);
+        config.setMaximumPoolSize(10);
+        config.setMinimumIdle(2);
+        config.setIdleTimeout(300000);
+        config.setConnectionTimeout(30000);
+        config.setLeakDetectionThreshold(60000);
+
         return config;
     }
 }

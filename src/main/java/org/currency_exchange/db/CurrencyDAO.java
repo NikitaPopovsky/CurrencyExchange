@@ -12,20 +12,18 @@ import java.util.Optional;
 
 public class CurrencyDAO {
 
-    private final Connection connection;
     private final CurrencyDAOMapper mapper;
 
-
     public CurrencyDAO() {
-        this.connection = UtilDAO.getConnection();
         this.mapper = new CurrencyDAOMapper();
     }
 
     public List<Currency> findAll() {
-        try {
-            Statement statement = connection.createStatement();
-            String sql = CurrencySQL.FIND_ALL.getSql();
-            ResultSet resultSet = statement.executeQuery(sql);
+        String sql = CurrencySQL.FIND_ALL.getSql();
+        try (Connection connection = UtilDAO.getConnection();
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(sql)) {
+
             return mapper.toCurrencyList(resultSet);
         } catch (SQLException e) {
             throw new DataBaseUnavailable(ExceptionMessage.DB_NOT_UNAVAILABLE.getMessage());
@@ -33,15 +31,18 @@ public class CurrencyDAO {
     }
 
     public Optional<Currency> findByCode (String code) {
-        try {
-            String sql = CurrencySQL.FIND_BY_CODE.getSql();
-            PreparedStatement statement = connection.prepareStatement(sql);
+        String sql = CurrencySQL.FIND_BY_CODE.getSql();
+        try (Connection connection = UtilDAO.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)){
+
             statement.setString(1,code);
-            ResultSet resultSet = statement.executeQuery();
-            if (resultSet.next()) {
-                return Optional.of(mapper.toCurrency(resultSet));
+
+            try (ResultSet resultSet = statement.executeQuery()){
+                if (resultSet.next()) {
+                    return Optional.of(mapper.toCurrency(resultSet));
+                }
+                return Optional.empty();
             }
-            return Optional.empty();
 
         } catch (SQLException e) {
             throw new DataBaseUnavailable(ExceptionMessage.DB_NOT_UNAVAILABLE.getMessage());
@@ -49,15 +50,17 @@ public class CurrencyDAO {
     }
 
     public Optional<Currency> findById (int id) {
-        try {
-            String sql = CurrencySQL.FIND_BY_ID.getSql();
-            PreparedStatement statement = connection.prepareStatement(sql);
+        String sql = CurrencySQL.FIND_BY_ID.getSql();
+        try (Connection connection = UtilDAO.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)){
+
             statement.setInt(1,id);
-            ResultSet resultSet = statement.executeQuery();
-            if (resultSet.next()) {
-                return Optional.of(mapper.toCurrency(resultSet));
+            try (ResultSet resultSet = statement.executeQuery()){
+                if (resultSet.next()) {
+                    return Optional.of(mapper.toCurrency(resultSet));
+                }
+                return Optional.empty();
             }
-            return Optional.empty();
 
         } catch (SQLException e) {
             throw new DataBaseUnavailable(ExceptionMessage.DB_NOT_UNAVAILABLE.getMessage());
@@ -65,9 +68,10 @@ public class CurrencyDAO {
     }
 
     public Currency save (Currency currency) {
-        try {
-            String sql = CurrencySQL.SAVE.getSql();
-            PreparedStatement statement = connection.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS);
+        String sql = CurrencySQL.SAVE.getSql();
+        try (Connection connection = UtilDAO.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS))   {
+
             String code = currency.code();
             String fullName = currency.fullName();
             String sign = currency.sign();

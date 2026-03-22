@@ -12,20 +12,18 @@ import java.util.List;
 import java.util.Optional;
 
 public class ExchangeRateDAO {
-    private final Connection connection;
     private final ExchangeRateDAOMapper mapper;
 
 
     public ExchangeRateDAO() {
-        this.connection = UtilDAO.getConnection();
         this.mapper = new ExchangeRateDAOMapper();
     }
 
     public List<ExchangeRate> findAll () {
-        try {
+        String sql = ExchangeRateSQL.FIND_ALL.getSql();
+        try (Connection connection = UtilDAO.getConnection();
             Statement statement = connection.createStatement();
-            String sql = ExchangeRateSQL.FIND_ALL.getSql();
-            ResultSet resultSet = statement.executeQuery(sql);
+            ResultSet resultSet = statement.executeQuery(sql)) {
             return mapper.toExchangeRateList(resultSet);
         } catch (SQLException e) {
             throw new DataBaseUnavailable(ExceptionMessage.DB_NOT_UNAVAILABLE.getMessage());
@@ -33,16 +31,18 @@ public class ExchangeRateDAO {
     }
 
     public Optional<ExchangeRate> findByPairCodeCurrency(String baseCurrencyCode, String targetCurrencyCode) {
-        try {
-            String sql = ExchangeRateSQL.FIND_BY_CURRENCIES_CODE.getSql();
-            PreparedStatement statement = connection.prepareStatement(sql);
+        String sql = ExchangeRateSQL.FIND_BY_CURRENCIES_CODE.getSql();
+        try (Connection connection = UtilDAO.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)){
             statement.setString(1,baseCurrencyCode);
             statement.setString(2,targetCurrencyCode);
-            ResultSet resultSet = statement.executeQuery();
-            if (resultSet.next()) {
-                return Optional.of(mapper.toExchangeRate(resultSet));
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return Optional.of(mapper.toExchangeRate(resultSet));
+                }
+                return Optional.empty();
             }
-            return Optional.empty();
 
         } catch (SQLException e) {
             throw new DataBaseUnavailable(ExceptionMessage.DB_NOT_UNAVAILABLE.getMessage());
@@ -50,9 +50,9 @@ public class ExchangeRateDAO {
     }
 
     public ExchangeRate save(ExchangeRate exchangeRate) {
-        try {
-            String sql = ExchangeRateSQL.SAVE.getSql();
-            PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+        String sql = ExchangeRateSQL.SAVE.getSql();
+        try (Connection connection = UtilDAO.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)){
             statement.setInt(1,exchangeRate.baseCurrency().id());
             statement.setInt(2,exchangeRate.targetCurrency().id());
             statement.setBigDecimal(3,exchangeRate.rate());
@@ -73,9 +73,10 @@ public class ExchangeRateDAO {
     }
 
     public ExchangeRate updateRate (ExchangeRate exchangeRate, BigDecimal rate) {
-        try {
-            String sql = ExchangeRateSQL.UPDATE_RATE.getSql();
-            PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+        String sql = ExchangeRateSQL.UPDATE_RATE.getSql();
+        try (Connection connection = UtilDAO.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)){
+
             statement.setBigDecimal(1,rate);
             statement.setInt(2,exchangeRate.id());
 
